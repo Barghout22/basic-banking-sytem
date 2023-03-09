@@ -47,3 +47,10 @@ td {
   height: 50px;
   border: 2px solid grey;
 }
+.CustomerLink:hover {
+  text-decoration: underline;
+}
+
+input {
+  width: 100px;
+}

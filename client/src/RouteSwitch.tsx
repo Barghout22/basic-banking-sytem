@@ -40,7 +40,12 @@ const RouteSwitch = () => {
         />
         <Route
           path="/view-customers"
-          element={<DisplayUser currentDispCust={currentDispCust} />}
+          element={
+            <DisplayUser
+              currentDispCust={currentDispCust}
+              allCustomers={allCustomers}
+            />
+          }
         />
       </Routes>
     </BrowserRouter>

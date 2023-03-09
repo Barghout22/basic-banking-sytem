@@ -15,27 +15,27 @@ const DisplayAllCustomers = ({
       <p>click on a customer to view past transactions and initiate new ones</p>
 
       <table>
-        <tr>
-          <th>Name</th>
-          <th>E-mail</th>
-          <th>Current Balance</th>
-        </tr>
-        {allCustomers.map((customer) => (
-          <tr key={customer.id}>
-            <Link to="/view-customers">
+        <tbody>
+          <tr>
+            <th>Name</th>
+            <th>E-mail</th>
+            <th>Current Balance</th>
+          </tr>
+          {allCustomers.map((customer) => (
+            <tr key={customer.id}>
               <td
                 className="CustomerLink"
                 onClick={() => {
                   setCurrentDispCust(customer.name);
                 }}
               >
-                {customer.name}{" "}
+                <Link to="/view-customers">{customer.name} </Link>
               </td>
-            </Link>
-            <td>{customer.email}</td>
-            <td>${customer.balance}</td>
-          </tr>
-        ))}
+              <td>{customer.email}</td>
+              <td>${customer.balance.toLocaleString()}</td>
+            </tr>
+          ))}
+        </tbody>
       </table>
     </div>
   );
