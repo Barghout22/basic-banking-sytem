@@ -62,6 +62,7 @@ const RouteSwitch = () => {
   }) {
     let allCustomersHolderVar = allCustomers;
     setAllTransactions([transaction, ...allTranscations]);
+    setDisplayedTransactions([transaction, ...displayedTranscations]);
     const senderIndex = allCustomersHolderVar.findIndex(
       (item) => item.name === transaction.sender
     );

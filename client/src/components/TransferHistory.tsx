@@ -101,7 +101,7 @@ const DisplayUser = ({
                   : transaction.sender}
               </td>
               <td>{transaction.date.toString()}</td>
-              <td>{transaction.amount}</td>
+              <td>${transaction.amount.toLocaleString()}</td>
             </tr>
           ))}
         </tbody>
