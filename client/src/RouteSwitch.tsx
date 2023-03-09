@@ -52,6 +52,27 @@ const RouteSwitch = () => {
     );
     setDisplayedTransactions(customerTransactions);
   }
+
+  function processTransactions(transaction: {
+    id: string;
+    sender: string;
+    receiver: string;
+    amount: number;
+    date: Date;
+  }) {
+    let allCustomersHolderVar = allCustomers;
+    setAllTransactions([transaction, ...allTranscations]);
+    const senderIndex = allCustomersHolderVar.findIndex(
+      (item) => item.name === transaction.sender
+    );
+    allCustomersHolderVar[senderIndex].balance -= transaction.amount;
+    const receiverIndex = allCustomersHolderVar.findIndex(
+      (item) => item.name === transaction.receiver
+    );
+    allCustomersHolderVar[receiverIndex].balance += transaction.amount;
+
+    setAllCustomers(allCustomersHolderVar);
+  }
   return (
     <BrowserRouter>
       <Routes>
@@ -72,6 +93,7 @@ const RouteSwitch = () => {
               currentDispCust={currentDispCust}
               allCustomers={allCustomers}
               transactions={displayedTranscations}
+              processTransactions={processTransactions}
             />
           }
         />

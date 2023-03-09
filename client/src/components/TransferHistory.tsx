@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import uniqid from "uniqid";
 
 const DisplayUser = ({
   allCustomers,
   currentDispCust,
   transactions,
+  processTransactions,
 }: {
   allCustomers: { id: string; name: string; email: string; balance: number }[];
   currentDispCust: string;
@@ -15,19 +17,28 @@ const DisplayUser = ({
     amount: number;
     date: Date;
   }[];
+  processTransactions: Function;
 }) => {
-  const currentDisp = allCustomers.find(
-    (customer) => customer.name === currentDispCust
+  const [currentDisp, setCurrentDisp] = useState(
+    allCustomers.find((customer) => customer.name === currentDispCust)
   );
-  const allOtherCusts = allCustomers.filter(
-    (customer) => customer.name !== currentDispCust
+  const [allOtherCusts, setAllOtherCusts] = useState(
+    allCustomers.filter((customer) => customer.name !== currentDispCust)
   );
+  const [transferAmount, setTransferAmount] = useState(0);
+  const [receiverState, setReceiverState] = useState("none");
 
   function disp(e: any) {
     e.preventDefault();
-    const formData = new FormData(e.target);
-    for (let [name, value] of formData.entries()) {
-      console.log(`${name}:${value}`);
+    if (currentDisp) {
+      let currentTransaction = {
+        sender: currentDisp.name,
+        date: new Date(),
+        id: uniqid(),
+        receiver: receiverState,
+        amount: transferAmount,
+      };
+      processTransactions(currentTransaction);
     }
   }
   return (
@@ -41,12 +52,23 @@ const DisplayUser = ({
       <form action="" onSubmit={disp}>
         <label>
           Initiate a new transfer{" "}
-          <input type="number" name="transferAmount" required />
+          <input
+            type="number"
+            name="amount"
+            required
+            onChange={(e) => setTransferAmount(parseInt(e.target.value))}
+          />
         </label>
         <label>
           {" "}
           to:{" "}
-          <select name="receiver" required>
+          <select
+            name="receiver"
+            required
+            onChange={(e) => {
+              setReceiverState(e.target.value);
+            }}
+          >
             <option value=""></option>
             {allOtherCusts.map((customer) => (
               <option key={customer.id} value={customer.name}>
