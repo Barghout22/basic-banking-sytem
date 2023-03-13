@@ -86,8 +86,8 @@ const DisplayUser = ({
         <tbody>
           <tr>
             <th>Sent\Received</th>
-            <th>To\From</th>
             <th>sender\Recipient Name</th>
+            <th>transaction time and date</th>
             <th>amount</th>
           </tr>
           {transactions.map((transaction) => (

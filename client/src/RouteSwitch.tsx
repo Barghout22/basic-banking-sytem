@@ -1,12 +1,30 @@
 import React from "react";
-import { useState } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { BrowserRouter, Routes, Route, Form } from "react-router-dom";
 import App from "./App";
 import DisplayAllCustomers from "./components/AllCustomerDisp";
 import DisplayUser from "./components/TransferHistory";
+import {
+  retrieveTransactions,
+  retrieveClientInfo,
+  postTransaction,
+  postData,
+} from "./components/AsyncFunctions";
 import uniqid from "uniqid";
 
 const RouteSwitch = () => {
+  useEffect(() => {
+    retrieveTransactions(allCustomers).then((transactions) => {
+      if (transactions !== "no previous history") {
+        setAllTransactions(transactions);
+        retrieveClientInfo().then((Clients) => {
+          Clients !== "no client information stored"
+            ? setAllCustomers(Clients)
+            : null;
+        });
+      }
+    });
+  }, []);
   const [currentDispCust, setCurrentDispCust] = useState("none");
   const [allTranscations, setAllTransactions] = useState([
     {
@@ -61,6 +79,7 @@ const RouteSwitch = () => {
     date: Date;
   }) {
     let allCustomersHolderVar = allCustomers;
+    postData("http://127.0.0.1:8002/newTransaction", transaction);
     setAllTransactions([transaction, ...allTranscations]);
     setDisplayedTransactions([transaction, ...displayedTranscations]);
     const senderIndex = allCustomersHolderVar.findIndex(
