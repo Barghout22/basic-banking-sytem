@@ -14,13 +14,15 @@ import uniqid from "uniqid";
 
 const RouteSwitch = () => {
   useEffect(() => {
-    retrieveTransactions(allCustomers).then((transactions) => {
+    retrieveTransactions().then((transactions) => {
       if (transactions !== "no previous history") {
         setAllTransactions(transactions);
         retrieveClientInfo().then((Clients) => {
           Clients !== "no client information stored"
             ? setAllCustomers(Clients)
-            : null;
+            : allCustomers.forEach((customer) =>
+                postData("http://127.0.0.1:8002/addClient", customer)
+              );
         });
       }
     });
@@ -79,7 +81,7 @@ const RouteSwitch = () => {
     date: Date;
   }) {
     let allCustomersHolderVar = allCustomers;
-    postData("http://127.0.0.1:8002/newTransaction", transaction);
+    postTransaction(transaction);
     setAllTransactions([transaction, ...allTranscations]);
     setDisplayedTransactions([transaction, ...displayedTranscations]);
     const senderIndex = allCustomersHolderVar.findIndex(

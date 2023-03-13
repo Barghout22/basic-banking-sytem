@@ -1,7 +1,6 @@
 // Setup empty JS object to act as endpoint for all routes
 let allTransactions = [];
 let allClientInfo = [];
-//{ id: uniqid(), name: "Jared", email: "jared@domain", balance: 10000 }
 
 // Require Express to run server and routes
 const express = require("express");
@@ -29,20 +28,24 @@ function listening() {
   console.log(`running on localhost: ${port}`);
 }
 
-app.post("/newTransaction", addTransaction);
-app.post("/addClient", addClientInfo);
+app.post("/newTransaction", newTransaction);
+app.post("/addClient", addClient);
 
-function addClientInfo(req, res) {
+function addClient(req, res) {
+  console.log(req.body);
   allClientInfo.push({
     id: req.body.id,
     name: req.body.name,
     email: req.body.email,
     balance: req.body.balance,
   });
+  // console.log(allClientInfo);
 }
 
-function addTransaction(req, res) {
-  console.log("hello");
+function newTransaction(req, res) {
+  // console.log("hello");
+  // console.log(allClientInfo);
+  console.log(req.body);
   allTransactions.unshift({
     id: req.body.id,
     sender: req.body.sender,
@@ -51,15 +54,18 @@ function addTransaction(req, res) {
     date: req.body.date,
   });
 
-  senderIndex = allClientInfo.findIndex(
-    (item) => item.sender === req.body.sender
-  );
-  receiverIndex = allClientInfo.findIndex(
-    (item) => item.receiver === req.body.receiver
-  );
-  allClientInfo[senderIndex].balance -= req.body.amount;
-  allClientInfo[receiverIndex].balance += req.body.amount;
+  let clientPlaceHolderInfo = allClientInfo;
 
+  senderIndex = clientPlaceHolderInfo.findIndex(
+    (item) => item.name === req.body.sender
+  );
+  receiverIndex = clientPlaceHolderInfo.findIndex(
+    (item) => item.name === req.body.receiver
+  );
+  clientPlaceHolderInfo[senderIndex].balance -= req.body.amount;
+  clientPlaceHolderInfo[receiverIndex].balance += req.body.amount;
+
+  allClientInfo = clientPlaceHolderInfo;
 }
 
 app.get("/allClientInfo", function (req, res) {

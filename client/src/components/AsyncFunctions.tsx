@@ -1,19 +1,9 @@
-export async function retrieveTransactions(
-  allClientInfo: { id: string; name: string; email: string; balance: number }[]
-) {
+export async function retrieveTransactions() {
   const request = await fetch("http://127.0.0.1:8002/allTransactions");
   try {
     const allTransactions = await request.json();
     if (!Array.isArray(allTransactions)) {
       //send all client data
-      allClientInfo.forEach((client) => {
-        postData("http://127.0.0.1:8002/addClient", {
-          id: client.id,
-          name: client.name,
-          email: client.email,
-          balance: client.balance,
-        });
-      });
       return allTransactions.message;
     }
     return allTransactions;
