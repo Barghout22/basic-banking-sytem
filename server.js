@@ -33,18 +33,18 @@ app.post("/addClient", addClient);
 
 function addClient(req, res) {
   console.log(req.body);
-  allClientInfo.push({
-    id: req.body.id,
-    name: req.body.name,
-    email: req.body.email,
-    balance: req.body.balance,
-  });
+  allClientInfo.find((element) => element.name === req.body.name)
+    ? null
+    : allClientInfo.push({
+        id: req.body.id,
+        name: req.body.name,
+        email: req.body.email,
+        balance: req.body.balance,
+      });
   // console.log(allClientInfo);
 }
 
 function newTransaction(req, res) {
-  // console.log("hello");
-  // console.log(allClientInfo);
   console.log(req.body);
   allTransactions.unshift({
     id: req.body.id,

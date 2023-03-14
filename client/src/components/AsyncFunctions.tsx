@@ -38,6 +38,15 @@ export function postTransaction(newTransaction: {
   console.log("hello");
 }
 
+export function postClients(
+  allClients: { id: string; name: string; email: string; balance: number }[]
+) {
+  allClients.forEach((customer) =>
+    {postData("http://127.0.0.1:8002/addClient", customer);
+    console.log(customer);}
+  );
+}
+
 // Create a new date instance dynamically with JS
 
 export const postData = async (url = "", data = {}) => {

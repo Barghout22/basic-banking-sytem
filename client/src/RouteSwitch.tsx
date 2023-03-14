@@ -8,23 +8,21 @@ import {
   retrieveTransactions,
   retrieveClientInfo,
   postTransaction,
-  postData,
+  postClients,
 } from "./components/AsyncFunctions";
 import uniqid from "uniqid";
 
 const RouteSwitch = () => {
   useEffect(() => {
     retrieveTransactions().then((transactions) => {
-      if (transactions !== "no previous history") {
-        setAllTransactions(transactions);
-        retrieveClientInfo().then((Clients) => {
-          Clients !== "no client information stored"
-            ? setAllCustomers(Clients)
-            : allCustomers.forEach((customer) =>
-                postData("http://127.0.0.1:8002/addClient", customer)
-              );
-        });
-      }
+      transactions === "no previous history"
+        ? null
+        : setAllTransactions(transactions);
+    });
+    retrieveClientInfo().then((Clients) => {
+      Clients !== "no client information stored"
+        ? setAllCustomers(Clients)
+        : postClients(allCustomers);
     });
   }, []);
   const [currentDispCust, setCurrentDispCust] = useState("none");
