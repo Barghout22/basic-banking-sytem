@@ -1,3 +1,11 @@
+const MongoClient = require("mongodb").MongoClient;
+const url =
+  "mongodb+srv://bankAdmin:bankAdminPass223@bankingcluster0.bg34oko.mongodb.net/?retryWrites=true&w=majority";
+
+MongoClient.connect(url, { useUnifiedTopology: true }, function (err, db) {
+  if (err) throw err;
+  console.log("database connected");
+});
 // Setup empty JS object to act as endpoint for all routes
 let allTransactions = [];
 let allClientInfo = [];
@@ -32,7 +40,7 @@ app.post("/newTransaction", newTransaction);
 app.post("/addClient", addClient);
 
 function addClient(req, res) {
-  console.log(req.body);
+  // console.log(req.body);
   allClientInfo = req.body;
   // allClientInfo.find((element) => element.name === req.body.name)
   //   ? null
@@ -46,7 +54,7 @@ function addClient(req, res) {
 }
 
 function newTransaction(req, res) {
-  console.log(req.body);
+  // console.log(req.body);
   allTransactions.unshift({
     id: req.body.id,
     sender: req.body.sender,
