@@ -26,7 +26,7 @@ export async function retrieveClientInfo() {
   }
 }
 
-export function postTransaction(newTransaction: {
+export async function postTransaction(newTransaction: {
   id: string;
   sender: string;
   receiver: string;
@@ -34,17 +34,15 @@ export function postTransaction(newTransaction: {
   date: Date;
 }) {
   console.log(newTransaction);
-  postData("http://127.0.0.1:8002/newTransaction", newTransaction);
+  await postData("http://127.0.0.1:8002/newTransaction", newTransaction);
   console.log("hello");
 }
 
 export function postClients(
   allClients: { id: string; name: string; email: string; balance: number }[]
 ) {
-  allClients.forEach((customer) =>
-    {postData("http://127.0.0.1:8002/addClient", customer);
-    console.log(customer);}
-  );
+  console.log(allClients);
+  postData("http://127.0.0.1:8002/addClient", allClients);
 }
 
 // Create a new date instance dynamically with JS

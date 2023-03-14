@@ -14,15 +14,16 @@ import uniqid from "uniqid";
 
 const RouteSwitch = () => {
   useEffect(() => {
+    retrieveClientInfo().then((Clients) => {
+      console.log(Clients);
+      Clients !== "no client information stored"
+        ? setAllCustomers(Clients)
+        : postClients(allCustomers);
+    });
     retrieveTransactions().then((transactions) => {
       transactions === "no previous history"
         ? null
         : setAllTransactions(transactions);
-    });
-    retrieveClientInfo().then((Clients) => {
-      Clients !== "no client information stored"
-        ? setAllCustomers(Clients)
-        : postClients(allCustomers);
     });
   }, []);
   const [currentDispCust, setCurrentDispCust] = useState("none");
