@@ -1,96 +1,164 @@
-const MongoClient = require("mongodb").MongoClient;
-const url =
-  "mongodb+srv://bankAdmin:bankAdminPass223@bankingcluster0.bg34oko.mongodb.net/?retryWrites=true&w=majority";
-
-MongoClient.connect(url, { useUnifiedTopology: true }, function (err, db) {
-  if (err) throw err;
-  console.log("database connected");
-});
-// Setup empty JS object to act as endpoint for all routes
-let allTransactions = [];
-let allClientInfo = [];
-
-// Require Express to run server and routes
 const express = require("express");
-
-// Start up an instance of app
+const mongoose = require("mongoose");
+const dotenv = require("dotenv");
 const app = express();
-/* Middleware*/
-//Here we are configuring express to use body-parser as middle-ware.
+dotenv.config();
+
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-// Cors for cross origin allowance
 const cors = require("cors");
 app.use(cors());
 app.options("*", cors());
-// Initialize the main project folder
 app.use(express.static("client"));
 
-// Setup Server
 const port = 8002;
-const server = app.listen(port, listening);
-function listening() {
-  console.log("server running");
-  console.log(`running on localhost: ${port}`);
+
+const dbName = "bankingcluster0";
+const uri = process.env.DB_URL;
+
+async function connectToDB() {
+  try {
+    await mongoose.connect(uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log("connected to server");
+  } catch (error) {
+    console.log(error);
+  }
 }
+
+connectToDB();
+
+const transactionSchema = new mongoose.Schema({
+  id: String,
+  sender: String,
+  receiver: String,
+  amount: Number,
+  date: Date,
+});
+const Transaction = mongoose.model("transcation", transactionSchema);
+
+const clientSchema = new mongoose.Schema({
+  id: String,
+  name: String,
+  email: String,
+  balance: Number,
+});
+const ClientInfo = mongoose.model("ClientInfo", clientSchema);
+
+// let allTransactions = [];
+// let allClientInfo = [];
 
 app.post("/newTransaction", newTransaction);
 app.post("/addClient", addClient);
 
 function addClient(req, res) {
   // console.log(req.body);
-  allClientInfo = req.body;
-  // allClientInfo.find((element) => element.name === req.body.name)
-  //   ? null
-  //   : allClientInfo.push({
-  //       id: req.body.id,
-  //       name: req.body.name,
-  //       email: req.body.email,
-  //       balance: req.body.balance,
-  //     });
-  // console.log(allClientInfo);
-}
-
-function newTransaction(req, res) {
-  // console.log(req.body);
-  allTransactions.unshift({
-    id: req.body.id,
-    sender: req.body.sender,
-    receiver: req.body.receiver,
-    amount: req.body.amount,
-    date: req.body.date,
+  const allClientInfo = req.body;
+  allClientInfo.forEach(async (customer) => {
+    const client = new ClientInfo({
+      id: customer.id,
+      name: customer.name,
+      email: customer.email,
+      balance: customer.balance,
+    });
+    try {
+      const savedClient = await client.save();
+      console.log(savedClient);
+    } catch (error) {
+      console.log(error);
+    }
   });
-
-  let clientPlaceHolderInfo = allClientInfo;
-
-  senderIndex = clientPlaceHolderInfo.findIndex(
-    (item) => item.name === req.body.sender
-  );
-  receiverIndex = clientPlaceHolderInfo.findIndex(
-    (item) => item.name === req.body.receiver
-  );
-  clientPlaceHolderInfo[senderIndex].balance -= req.body.amount;
-  clientPlaceHolderInfo[receiverIndex].balance += req.body.amount;
-
-  allClientInfo = clientPlaceHolderInfo;
 }
 
-app.get("/allClientInfo", function (req, res) {
-  if (allClientInfo.length > 0) {
-    res.send(allClientInfo);
-  } else {
-    const falseResponse = { message: "no client information stored" };
-    res.send(falseResponse);
+async function newTransaction(req, res) {
+  // console.log(req.body);
+  try {
+    const transaction = new Transaction({
+      id: req.body.id,
+      sender: req.body.sender,
+      receiver: req.body.receiver,
+      amount: req.body.amount,
+      date: req.body.date,
+    });
+    await transaction.save();
+    const clientInfo = await ClientInfo.find();
+    const sender = clientInfo.find((item) => item.name === req.body.sender);
+    const receiver = clientInfo.find((item) => item.name === req.body.receiver);
+    sender.balance -= req.body.amount;
+    receiver.balance += req.body.amount;
+    await ClientInfo.findByIdAndUpdate(sender._id, { balance: sender.balance });
+    await ClientInfo.findByIdAndUpdate(receiver._id, {
+      balance: receiver.balance,
+    });
+    res.send({ message: "transcation completed successfully" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ error: "enternal server error" });
+  }
+}
+
+app.get("/allClientInfo", async function (req, res) {
+  try {
+    const allClientInfo = await ClientInfo.find();
+    let allClientInfoWithoutDuplicates = [];
+    allClientInfo.forEach((item) => {
+      if (
+        !allClientInfoWithoutDuplicates.find(
+          (entry) => entry.name === item.name
+        )
+      ) {
+        allClientInfoWithoutDuplicates.push(item);
+      }
+    });
+    // console.log("with duplicates:", allClientInfo);
+    // console.log("without", allClientInfoWithoutDuplicates);
+    if (allClientInfo.length > allClientInfoWithoutDuplicates.length) {
+      await ClientInfo.deleteMany({});
+      await ClientInfo.insertMany(
+        allClientInfoWithoutDuplicates,
+        function (error) {
+          if (error) {
+            console.log(error);
+          } else {
+            console.log("collection updated");
+          }
+        }
+      );
+    }
+
+    if (allClientInfoWithoutDuplicates.length > 0) {
+      res.send(allClientInfoWithoutDuplicates);
+    } else {
+      const falseResponse = { message: "no client information stored" };
+      res.send(falseResponse);
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ error: "internal server error" });
   }
 });
 
-app.get("/allTransactions", function (req, res) {
-  if (allTransactions.length > 0) {
-    res.send(allTransactions);
-  } else {
-    const falseResponse = { message: "no previous history" };
-    res.send(falseResponse);
+app.get("/allTransactions", async function (req, res) {
+  try {
+    const allTransactions = await Transaction.find().sort({ date: -1 });
+    if (allTransactions.length > 0) {
+      res.send(allTransactions);
+    } else {
+      const falseResponse = { message: "no previous history" };
+      res.send(falseResponse);
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ error: "internal server error" });
   }
 });
+
+const server = app.listen(port, listening);
+function listening() {
+  console.log("server running");
+  console.log(`running on localhost: ${port}`);
+}

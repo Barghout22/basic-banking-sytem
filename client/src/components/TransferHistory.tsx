@@ -55,6 +55,7 @@ const DisplayUser = ({
           <input
             type="number"
             name="amount"
+            min={1}
             required
             onChange={(e) => setTransferAmount(parseInt(e.target.value))}
           />
