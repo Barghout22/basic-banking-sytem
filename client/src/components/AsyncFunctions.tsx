@@ -3,7 +3,6 @@ export async function retrieveTransactions() {
   try {
     const allTransactions = await request.json();
     if (!Array.isArray(allTransactions)) {
-      //send all client data
       return allTransactions.message;
     }
     return allTransactions;
@@ -33,15 +32,12 @@ export async function postTransaction(newTransaction: {
   amount: number;
   date: Date;
 }) {
-  // console.log(newTransaction);
   await postData("http://127.0.0.1:8002/newTransaction", newTransaction);
-  // console.log("hello");
 }
 
 export function postClients(
   allClients: { id: string; name: string; email: string; balance: number }[]
 ) {
-  // console.log(allClients);
   postData("http://127.0.0.1:8002/addClient", allClients);
 }
 

@@ -49,14 +49,10 @@ const clientSchema = new mongoose.Schema({
 });
 const ClientInfo = mongoose.model("ClientInfo", clientSchema);
 
-// let allTransactions = [];
-// let allClientInfo = [];
-
 app.post("/newTransaction", newTransaction);
 app.post("/addClient", addClient);
 
 function addClient(req, res) {
-  // console.log(req.body);
   const allClientInfo = req.body;
   allClientInfo.forEach(async (customer) => {
     const client = new ClientInfo({
@@ -75,7 +71,6 @@ function addClient(req, res) {
 }
 
 async function newTransaction(req, res) {
-  // console.log(req.body);
   try {
     const transaction = new Transaction({
       id: req.body.id,
@@ -114,8 +109,6 @@ app.get("/allClientInfo", async function (req, res) {
         allClientInfoWithoutDuplicates.push(item);
       }
     });
-    // console.log("with duplicates:", allClientInfo);
-    // console.log("without", allClientInfoWithoutDuplicates);
     if (allClientInfo.length > allClientInfoWithoutDuplicates.length) {
       await ClientInfo.deleteMany({});
       await ClientInfo.insertMany(

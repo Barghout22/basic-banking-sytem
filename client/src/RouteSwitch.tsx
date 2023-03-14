@@ -15,7 +15,6 @@ import uniqid from "uniqid";
 const RouteSwitch = () => {
   useEffect(() => {
     retrieveClientInfo().then((Clients) => {
-      // console.log(Clients);
       Clients !== "no client information stored"
         ? setAllCustomers(Clients)
         : postClients(allCustomers);
